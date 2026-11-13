@@ -1,530 +1,386 @@
-
+ 
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MAYANK SNAKE ARENA</title>
+<title>MAYANK KING SNAKE ARENA</title>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
 *{box-sizing:border-box}
-body{
- margin:0;
- font-family:Arial,sans-serif;
- color:white;
- text-align:center;
- background:linear-gradient(135deg,#090979,#00d4ff,#8e2de2,#ff0080);
- background-size:400% 400%;
- animation:bg 10s ease infinite;
-}
-@keyframes bg{
- 0%{background-position:0 50%}
- 50%{background-position:100% 50%}
- 100%{background-position:0 50%}
-}
-h1{font-size:32px;text-shadow:0 0 15px cyan}
-.panel{
- background:#101020ee;
- border:2px solid cyan;
- border-radius:15px;
- padding:15px;
- margin:15px auto;
- max-width:650px;
- width:94%;
- box-shadow:0 0 20px #00ffff55;
-}
-input,button{
- padding:12px;
- margin:5px;
- border:0;
- border-radius:8px;
- font-size:15px;
-}
-input{width:180px}
-button{
- background:linear-gradient(45deg,#00eaff,#00ff77);
- color:#111;
- font-weight:bold;
- cursor:pointer;
-}
-button:hover{transform:scale(1.04)}
-#my-id{color:#00ff9d;font-size:25px;font-weight:bold}
-#status{color:#ffe66d}
-canvas{
- width:min(94vw,600px);
- height:auto;
- background:#10151d;
- border:3px solid cyan;
- border-radius:12px;
- box-shadow:0 0 25px #00ffff88;
-}
-.scores{
- display:flex;
- justify-content:space-around;
- gap:10px;
- flex-wrap:wrap;
-}
-.score{
- background:#202040;
- border-radius:10px;
- padding:12px;
- min-width:120px;
-}
-.controls{
- display:grid;
- grid-template-columns:repeat(3,65px);
- justify-content:center;
- gap:7px;
- margin:15px;
-}
-.controls button{font-size:23px;padding:12px}
-#message{color:yellow;font-weight:bold}
+body{margin:0;background:radial-gradient(circle at top,#263e5b,#07101d 70%);color:white;font-family:Arial;text-align:center}
+header{padding:18px 8px}
+h1{color:#ffe66d;text-shadow:0 0 15px orange;margin:5px;font-size:clamp(25px,5vw,42px)}
+.panel{width:96%;max-width:1150px;margin:auto;background:#111e31;border:1px solid #526985;border-radius:18px;padding:15px}
+.controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:12px}
+button,input{padding:12px;border:0;border-radius:9px;font-size:15px}
+button{background:linear-gradient(120deg,#ffc400,#ff7200);font-weight:bold;cursor:pointer}
+input{width:190px;background:#edf3ff}
+#status{color:#8fffc1;min-height:24px;margin:10px}
+#room{color:#ffe66d;font-size:25px;font-weight:bold;letter-spacing:4px}
+.players{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.player{background:#1d2d44;padding:12px 5px;border-radius:10px;border:1px solid #526985}
+.player b{display:block;margin-bottom:6px}
+canvas{width:100%;max-width:1050px;background:#06111e;border:3px solid #6b8eaf;border-radius:12px;display:block;margin:auto;touch-action:none}
+.mobile{display:grid;grid-template-columns:repeat(3,55px);gap:6px;justify-content:center;margin:15px auto}
+.mobile button{font-size:20px;padding:12px}
+.help{font-size:13px;color:#b7c9dc;line-height:1.7}
+@media(max-width:600px){.players{grid-template-columns:repeat(2,1fr)}.panel{padding:7px}}
 </style>
 </head>
-
 <body>
-
-<h1>🐍 MAYANK SNAKE ARENA</h1>
-<p>🌐 ONLINE MULTIPLAYER GAME</p>
-
-<div class="panel">
-<h3>🎮 PLAY WITH YOUR FRIEND</h3>
-<p>Your Room ID:</p>
-<div id="my-id">Connecting...</div>
-<button onclick="copyID()">📋 COPY ROOM ID</button>
-<br>
-<input id="join-id" maxlength="6" placeholder="Friend Room ID">
-<button onclick="connectFriend()">JOIN ROOM</button>
-<p id="status">Connecting to server...</p>
-</div>
+<header>
+<h1>👑 MAYANK KING SNAKE ARENA</h1>
+<p>🌈 Rainbow Snakes • 🍉 Fruit Challenge • Online Multiplayer</p>
+</header>
 
 <div class="panel">
-
-<div class="scores">
-<div class="score">
-🟢 MAYANK
-<h2 id="my-score">0</h2>
-</div>
-<div class="score">
-🔴 FRIEND
-<h2 id="friend-score">0</h2>
-</div>
-</div>
-
-<canvas id="game" width="600" height="400"></canvas>
-
-<p id="message">Connect with your friend to play!</p>
-
-<button onclick="startGame()">▶ START GAME</button>
-<button onclick="resetGame()">🔄 RESTART</button>
-
-<h3>🎮 CONTROLS</h3>
-
 <div class="controls">
-<span></span>
-<button onclick="move('up')">⬆️</button>
-<span></span>
-<button onclick="move('left')">⬅️</button>
-<button onclick="move('down')">⬇️</button>
-<button onclick="move('right')">➡️</button>
+<button onclick="createRoom()">CREATE ROOM</button>
+<input id="roomInput" maxlength="6" inputmode="numeric" placeholder="6 Digit Room PIN">
+<button onclick="joinRoom()">JOIN ROOM</button>
+</div>
+<div id="status">Create a room or enter your friend's PIN.</div>
+<div>ROOM PIN: <span id="room">------</span></div>
+
+<div class="players">
+<div class="player"><b style="color:#ffe66d">👑 MAYANK KING</b><span id="s0">Score: 0</span></div>
+<div class="player"><b style="color:#58eaff">⚡ DEV</b><span id="s1">Score: 0</span></div>
+<div class="player"><b style="color:#ff75b5">🔥 ROHIT</b><span id="s2">Score: 0</span></div>
+<div class="player"><b style="color:#8fff75">💎 RAJ</b><span id="s3">Score: 0</span></div>
 </div>
 
+<canvas id="game" width="1000" height="620"></canvas>
+
+<div class="mobile">
+<button onclick="sendDir(0,-1)">⬆️</button>
+<button onclick="sendDir(-1,0)">⬅️</button>
+<button onclick="sendDir(1,0)">➡️</button>
+<button onclick="sendDir(0,1)" style="grid-column:2">⬇️</button>
 </div>
 
-<p>🏆 CREATED BY MAYANK</p>
-
-<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<button onclick="restartGame()">🔄 RESTART GAME</button>
+<p class="help">
+Computer: Arrow Keys or WASD<br>
+Mobile: Use direction buttons<br>
+Host creates room and shares the 6-digit PIN with friends.
+</p>
+</div>
 
 <script>
 const canvas=document.getElementById("game");
 const ctx=canvas.getContext("2d");
+const CELL=20,COLS=50,ROWS=31;
+const names=["MAYANK KING","DEV","ROHIT","RAJ"];
+const fruits=["🍎","🍌","🍊","🍇","🍓","🍉","🍍","🥝","🍒","🥭"];
 
-const SIZE=20,COLS=30,ROWS=20;
+let peer=null,host=false,hostConn=null;
+let connections=[],myIndex=-1;
+let players=[],fruit=null,running=false;
+let timer=null;
 
-let peer,conn=null,isHost=false;
-let gameRunning=false,timer=null;
-let speed=100;
+function say(t){document.getElementById("status").textContent=t}
+function showRoom(id){document.getElementById("room").textContent=id}
 
-let snake=[
-{x:5,y:5},{x:4,y:5},{x:3,y:5}
-];
-
-let enemy=[
-{x:20,y:12},{x:21,y:12},{x:22,y:12}
-];
-
-let direction="right";
-let nextDirection="right";
-
-let food={x:15,y:10};
-let myScore=0,enemyScore=0;
-
-const COLORS=[
-"#00ff88","#ff00ff","#00d9ff",
-"#ffff00","#ff6600","#ff3366",
-"#a855f7","#ffffff"
-];
-
-function randomFood(){
- let p;
- do{
-  p={
-   x:Math.floor(Math.random()*COLS),
-   y:Math.floor(Math.random()*ROWS)
-  };
- }while(
- snake.some(s=>s.x===p.x&&s.y===p.y)||
- enemy.some(s=>s.x===p.x&&s.y===p.y)
- );
- return p;
+function makePlayer(i){
+ const starts=[
+  {x:7,y:7,dx:1},
+  {x:42,y:7,dx:-1},
+  {x:7,y:23,dx:1},
+  {x:42,y:23,dx:-1}
+ ];
+ const a=starts[i];
+ return {
+  id:i,name:names[i],
+  snake:[{x:a.x,y:a.y},{x:a.x-a.dx,y:a.y},{x:a.x-2*a.dx,y:a.y}],
+  dir:{x:a.dx,y:0},
+  next:{x:a.dx,y:0},
+  score:0,alive:true
+ };
 }
 
-function sendData(data){
- if(conn&&conn.open)conn.send(data);
+function randomFruit(){
+ return {
+  x:Math.floor(Math.random()*COLS),
+  y:Math.floor(Math.random()*ROWS),
+  type:Math.floor(Math.random()*fruits.length)
+ };
 }
 
-function initPeer(){
- const id=String(Math.floor(100000+Math.random()*900000));
- peer=new Peer(id);
+function freshGame(){
+ players=[0,1,2,3].map(makePlayer);
+ fruit=randomFruit();
+ running=true;
+ draw();
+}
+
+function createRoom(){
+ if(peer)peer.destroy();
+ if(timer)clearInterval(timer);
+
+ host=true;
+ myIndex=0;
+ connections=[];
+
+ const pin=String(Math.floor(100000+Math.random()*900000));
+ say("Creating your 6-digit PIN...");
+
+ peer=new Peer(pin);
 
  peer.on("open",id=>{
-  document.getElementById("my-id").innerText=id;
-  document.getElementById("status").innerText=
-  "🟢 ONLINE! Share your ID with friend.";
+  showRoom(id);
+  say("Room created! Share this 6-digit PIN with friends.");
+  freshGame();
+  startHost();
  });
 
- peer.on("connection",connection=>{
-  if(conn){
-   connection.close();
-   return;
-  }
-  conn=connection;
-  isHost=true;
-  setupConnection();
- });
+ peer.on("connection",conn=>{
+  conn.on("open",()=>{
+   const slot=[1,2,3].find(i=>!connections.some(c=>c.slot===i));
 
- peer.on("error",err=>{
-  if(err.type==="unavailable-id"){
-   peer.destroy();
-   initPeer();
-  }else{
-   document.getElementById("status").innerText=
-   "Connection error: "+err.type;
-  }
- });
-}
+   if(slot===undefined){
+    conn.send({type:"full"});
+    conn.close();
+    return;
+   }
 
-function connectFriend(){
- if(!peer||!peer.open){
-  alert("Wait for your Room ID!");
-  return;
- }
+   conn.slot=slot;
+   connections.push(conn);
 
- const id=document.getElementById("join-id").value.trim();
+   conn.send({type:"welcome",slot,players,fruit,running});
+   broadcast();
 
- if(!/^\d{6}$/.test(id)){
-  alert("Enter a valid 6-digit Room ID!");
-  return;
- }
-
- if(id===document.getElementById("my-id").innerText){
-  alert("You cannot join your own room!");
-  return;
- }
-
- if(conn){
-  alert("Already connected!");
-  return;
- }
-
- conn=peer.connect(id);
- isHost=false;
- setupConnection();
-}
-
-function setupConnection(){
-
- document.getElementById("status").innerText="Connecting...";
-
- conn.on("open",()=>{
-  document.getElementById("status").innerText=
-  "🟢 FRIEND CONNECTED!";
-
-  document.getElementById("message").innerText=
-  "Both players ready!";
-
-  if(isHost){
-   sendData({
-    type:"initial",
-    food:food,
-    snake:snake,
-    score:myScore
+   conn.on("data",data=>{
+    if(data.type==="dir"&&players[slot]){
+     const p=players[slot];
+     if(!(data.dir.x===-p.dir.x&&data.dir.y===-p.dir.y)){
+      p.next=data.dir;
+     }
+    }
    });
-  }else{
-   sendData({type:"request"});
-  }
- });
 
- conn.on("data",data=>{
-
-  if(data.type==="initial"&&!isHost){
-   food=data.food;
-   enemy=data.snake;
-
-   snake=[
-    {x:20,y:12},
-    {x:21,y:12},
-    {x:22,y:12}
-   ];
-
-   enemyScore=data.score||0;
-   document.getElementById("friend-score").innerText=enemyScore;
-   draw();
-  }
-
-  if(data.type==="state"){
-   enemy=data.snake;
-   enemyScore=data.score;
-   document.getElementById("friend-score").innerText=enemyScore;
-   draw();
-  }
-
-  if(data.type==="eat"&&isHost){
-   food=randomFood();
-   sendData({type:"food",food:food});
-  }
-
-  if(data.type==="food"){
-   food=data.food;
-  }
-
-  if(data.type==="request"&&isHost){
-   sendData({
-    type:"initial",
-    food:food,
-    snake:snake,
-    score:myScore
+   conn.on("close",()=>{
+    connections=connections.filter(c=>c!==conn);
+    if(players[slot])players[slot].alive=false;
+    broadcast();
    });
-  }
-
-  if(data.type==="restart"){
-   applyRestart(data.food);
-  }
-
+  });
  });
 
- conn.on("close",()=>{
-  document.getElementById("status").innerText=
-  "🔴 Friend Disconnected";
+ peer.on("error",e=>{
+  say("Room error: "+e.type+". Try creating a new room.");
+ });
+}
 
-  conn=null;
-  gameRunning=false;
-  clearInterval(timer);
+function joinRoom(){
+ const pin=document.getElementById("roomInput").value.trim();
+
+ if(!/^\d{6}$/.test(pin)){
+  say("Please enter a valid 6-digit PIN.");
+  return;
+ }
+
+ if(peer)peer.destroy();
+ if(timer)clearInterval(timer);
+
+ host=false;
+ myIndex=-1;
+ say("Connecting to room...");
+
+ peer=new Peer();
+
+ peer.on("open",()=>{
+  hostConn=peer.connect(pin,{reliable:true});
+
+  hostConn.on("open",()=>{
+   showRoom(pin);
+   say("Connected! Waiting for game information...");
+  });
+
+  hostConn.on("data",data=>{
+   if(data.type==="full"){
+    say("Room is full! Maximum 4 players.");
+    return;
+   }
+
+   if(data.type==="welcome"){
+    myIndex=data.slot;
+    players=data.players;
+    fruit=data.fruit;
+    running=data.running;
+    say("Joined as "+names[myIndex]+"!");
+    draw();
+   }
+
+   if(data.type==="state"){
+    players=data.players;
+    fruit=data.fruit;
+    running=data.running;
+    draw();
+   }
+  });
+
+  hostConn.on("close",()=>say("Host disconnected."));
  });
 
+ peer.on("error",e=>{
+  say("Could not join: "+e.type+". Check the PIN and try again.");
+ });
 }
 
-function copyID(){
- const id=document.getElementById("my-id").innerText;
+function startHost(){
+ if(timer)clearInterval(timer);
 
- if(id!=="Connecting..."){
-  navigator.clipboard.writeText(id)
-  .then(()=>alert("Room ID copied: "+id))
-  .catch(()=>alert("Your Room ID: "+id));
+ timer=setInterval(()=>{
+  if(!running)return;
+  updateGame();
+  broadcast();
+  draw();
+ },125);
+}
+
+function broadcast(){
+ const message={type:"state",players,fruit,running};
+ connections.forEach(c=>{
+  if(c.open)c.send(message);
+ });
+}
+
+function sendDir(x,y){
+ if(myIndex<0||!players[myIndex])return;
+
+ const p=players[myIndex];
+ if(!p.alive)return;
+ if(x===-p.dir.x&&y===-p.dir.y)return;
+
+ if(host){
+  p.next={x,y};
+ }else if(hostConn&&hostConn.open){
+  hostConn.send({type:"dir",dir:{x,y}});
  }
 }
 
-function move(d){
- const opposite={
-  up:"down",down:"up",
-  left:"right",right:"left"
- };
+function updateGame(){
+ for(const p of players){
+  if(!p||!p.alive)continue;
 
- if(opposite[d]!==direction){
-  nextDirection=d;
- }
-}
+  p.dir=p.next;
+  const head={
+   x:p.snake[0].x+p.dir.x,
+   y:p.snake[0].y+p.dir.y
+  };
 
-document.addEventListener("keydown",e=>{
- const keys={
-  ArrowUp:"up",ArrowDown:"down",
-  ArrowLeft:"left",ArrowRight:"right",
-  w:"up",s:"down",a:"left",d:"right"
- };
+  if(head.x<0||head.x>=COLS||head.y<0||head.y>=ROWS){
+   p.alive=false;
+   continue;
+  }
 
- if(keys[e.key]){
-  e.preventDefault();
-  move(keys[e.key]);
- }
-});
+  if(p.snake.some(s=>s.x===head.x&&s.y===head.y)){
+   p.alive=false;
+   continue;
+  }
 
-function startGame(){
- if(!conn||!conn.open){
-  document.getElementById("message").innerText=
-  "First connect with your friend!";
-  return;
- }
+  p.snake.unshift(head);
 
- if(gameRunning)return;
-
- gameRunning=true;
-
- document.getElementById("message").innerText=
- "🔥 GAME STARTED!";
-
- timer=setInterval(update,speed);
-}
-
-function resetLocal(foodPosition){
- clearInterval(timer);
- gameRunning=false;
-
- snake=isHost
- ?[{x:5,y:5},{x:4,y:5},{x:3,y:5}]
- :[{x:20,y:12},{x:21,y:12},{x:22,y:12}];
-
- enemy=isHost
- ?[{x:20,y:12},{x:21,y:12},{x:22,y:12}]
- :[{x:5,y:5},{x:4,y:5},{x:3,y:5}];
-
- direction=isHost?"right":"left";
- nextDirection=direction;
-
- myScore=0;
- enemyScore=0;
-
- if(foodPosition)food=foodPosition;
-
- document.getElementById("my-score").innerText=0;
- document.getElementById("friend-score").innerText=0;
- document.getElementById("message").innerText="Ready to play!";
-
- draw();
-}
-
-function applyRestart(newFood){
- resetLocal(newFood);
-}
-
-function resetGame(){
- if(!conn||!conn.open){
-  document.getElementById("message").innerText=
-  "Connect with friend first!";
-  return;
- }
-
- if(isHost){
-  food=randomFood();
-  resetLocal(food);
-  sendData({type:"restart",food:food});
- }else{
-  sendData({type:"restart-request"});
- }
-}
-
-// Host controls the shared restart
-function update(){
- if(!gameRunning)return;
-
- direction=nextDirection;
-
- let head={...snake[0]};
-
- if(direction==="up")head.y--;
- if(direction==="down")head.y++;
- if(direction==="left")head.x--;
- if(direction==="right")head.x++;
-
- if(head.x<0||head.x>=COLS||
-    head.y<0||head.y>=ROWS||
-    snake.some((s,i)=>i>0&&s.x===head.x&&s.y===head.y)){
-  endGame("You crashed! Friend wins!");
-  return;
- }
-
- snake.unshift(head);
-
- if(head.x===food.x&&head.y===food.y){
-  myScore+=10;
-  document.getElementById("my-score").innerText=myScore;
-
-  if(isHost){
-   food=randomFood();
-   sendData({type:"food",food:food});
+  if(fruit&&head.x===fruit.x&&head.y===fruit.y){
+   p.score+=10;
+   fruit=randomFruit();
   }else{
-   sendData({type:"eat"});
+   p.snake.pop();
   }
- }else{
-  snake.pop();
  }
 
- sendData({
-  type:"state",
-  snake:snake,
-  score:myScore
- });
-
- draw();
-}
-
-function endGame(msg){
- gameRunning=false;
- clearInterval(timer);
-
- document.getElementById("message").innerText="🏆 "+msg;
+ if(players.every(p=>!p.alive))running=false;
 }
 
 function draw(){
- ctx.clearRect(0,0,600,400);
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ ctx.fillStyle="#06111e";
+ ctx.fillRect(0,0,canvas.width,canvas.height);
 
- for(let y=0;y<ROWS;y++){
-  for(let x=0;x<COLS;x++){
-   ctx.fillStyle=(x+y)%2===0?"#182333":"#202b3b";
-   ctx.fillRect(x*SIZE,y*SIZE,SIZE,SIZE);
-  }
+ ctx.strokeStyle="#14263a";
+ ctx.lineWidth=.5;
+
+ for(let x=0;x<=canvas.width;x+=CELL){
+  ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();
+ }
+ for(let y=0;y<=canvas.height;y+=CELL){
+  ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();
  }
 
- // Food
- ctx.fillStyle="#ff3030";
- ctx.shadowColor="#ff0000";
- ctx.shadowBlur=15;
- ctx.beginPath();
- ctx.arc(food.x*SIZE+10,food.y*SIZE+10,8,0,Math.PI*2);
- ctx.fill();
- ctx.shadowBlur=0;
+ players.forEach((p,i)=>{
+  if(!p)return;
 
- // Mayank snake
- snake.forEach((s,i)=>{
-  ctx.fillStyle=COLORS[i%COLORS.length];
-  ctx.fillRect(s.x*SIZE+1,s.y*SIZE+1,18,18);
+  document.getElementById("s"+i).textContent=
+   "Score: "+p.score+(p.alive?"":" • OUT");
+
+  p.snake.forEach((s,j)=>{
+   const hue=(Date.now()/15+j*18+i*75)%360;
+   ctx.fillStyle=`hsl(${hue},100%,${j===0?65:50}%)`;
+   ctx.shadowColor=ctx.fillStyle;
+   ctx.shadowBlur=8;
+
+   ctx.beginPath();
+   ctx.roundRect(s.x*CELL+2,s.y*CELL+2,CELL-4,CELL-4,6);
+   ctx.fill();
+   ctx.shadowBlur=0;
+  });
+
+  if(p.snake[0]){
+   ctx.fillStyle="white";
+   ctx.font="bold 12px Arial";
+   ctx.fillText(p.name,p.snake[0].x*CELL-5,p.snake[0].y*CELL-8);
+  }
  });
 
- // Friend snake
- enemy.forEach((s,i)=>{
-  ctx.fillStyle=i===0?"#ff4444":"#ff8800";
-  ctx.fillRect(s.x*SIZE+1,s.y*SIZE+1,18,18);
- });
+ if(fruit){
+  ctx.font="25px Arial";
+  ctx.textAlign="center";
+  ctx.fillText(fruits[fruit.type],fruit.x*CELL+10,fruit.y*CELL+18);
+ }
 
- ctx.font="12px Arial";
- ctx.fillStyle="white";
-
- if(snake.length)
- ctx.fillText(isHost?"MAYANK":"FRIEND",
- snake[0].x*SIZE,snake[0].y*SIZE-5);
-
- if(enemy.length)
- ctx.fillText(isHost?"FRIEND":"MAYANK",
- enemy[0].x*SIZE,enemy[0].y*SIZE-5);
+ if(!running){
+  ctx.fillStyle="#000a";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#ffe66d";
+  ctx.textAlign="center";
+  ctx.font="bold 40px Arial";
+  ctx.fillText("GAME OVER",500,290);
+  ctx.fillStyle="white";
+  ctx.font="18px Arial";
+  ctx.fillText("Press RESTART GAME",500,330);
+ }
 }
 
-// Handle restart request from friend
-const originalSetupConnection=setupConnection;
+function restartGame(){
+ if(!host){
+  say("Only the room host can restart the game.");
+  return;
+ }
+ freshGame();
+ broadcast();
+ say("New game started!");
+}
 
-// Add restart-request handling through the connection data listener
-// (included in the data handler below in the final implementation)
+window.addEventListener("keydown",e=>{
+ const keys={
+  ArrowUp:[0,-1],w:[0,-1],
+  ArrowDown:[0,1],s:[0,1],
+  ArrowLeft:[-1,0],a:[-1,0],
+  ArrowRight:[1,0],d:[1,0]
+ };
 
+ const k=keys[e.key]||keys[e.key.toLowerCase()];
+ if(k){
+  e.preventDefault();
+  sendDir(k[0],k[1]);
+ }
+});
+
+players=[0,1,2,3].map(makePlayer);
+fruit=randomFruit();
+running=false;
 draw();
-initPeer();
 </script>
-
 </body>
 </html>
